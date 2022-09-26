@@ -6,6 +6,8 @@ import 'package:secure_it/src/base/user/user_dashboard/user_dashboard.dart';
 import 'package:secure_it/utils/app_button.dart';
 import 'package:secure_it/utils/heights_widths.dart';
 import 'package:sizer/sizer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -18,8 +20,25 @@ class _LoginViewState extends State<LoginView> {
   bool isObscure = true;
   FocusNode numberFN = FocusNode();
   FocusNode otpFN = FocusNode();
-  TextEditingController numberC = TextEditingController();
-  TextEditingController otpC = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+
+    super.dispose();
+  }
+
+  Future signIn() async {
+    print(emailController.text.trim());
+    print(passwordController.text.trim());
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Phone No",
+                    "Email",
                     style: R.textStyles.poppins(
                       color: R.colors.black,
                       fontSize: 18,
@@ -107,12 +126,13 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   h1,
                   TextFormField(
-                    decoration: R.decoration
-                        .fieldDecoration(hintText: 'Enter your phone number'),
+                    controller: emailController,
+                    decoration: R.decoration.fieldDecoration(
+                        hintText: 'Enter your registered email address'),
                   ),
                   h3,
                   Text(
-                    "OTP",
+                    "Password",
                     style: R.textStyles.poppins(
                       color: R.colors.black,
                       fontSize: 18,
@@ -121,8 +141,9 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   h1,
                   TextFormField(
+                    controller: passwordController,
                     decoration: R.decoration.fieldDecoration(
-                      hintText: 'Enter your OTP',
+                      hintText: 'Enter your password',
                       suffixIcon: InkWell(
                         onTap: () {
                           setState(() {
@@ -142,9 +163,7 @@ class _LoginViewState extends State<LoginView> {
                   h3,
                   h4,
                   AppButton(
-                    onTap: () {
-                      Get.to(() => const UserDashboard());
-                    },
+                    onTap: signIn,
                     buttonTitle: 'Sign In',
                     color: R.colors.themeColor,
                   ),
